@@ -13,12 +13,17 @@ $(document).ready(function() {
   firebase.initializeApp(config);
 
   const database = firebase.database();
-
+  const now = moment();
 
   let name = "";
   let destination = "";
   let firstTrainTime = 0;
   let frequency = 0;
+  let minutesAway = 0;
+  let militaryTime = "HH:mm"
+  let startTime = moment(firstTrainTime, militaryTime)
+
+  
 
 
   //Add to database
@@ -45,10 +50,27 @@ $(document).ready(function() {
 
   });
 
-
+//display database on table
   database.ref().on("child_added", function(childSnapshot , prevChildKey) {
 
-    $("#train-table").append(`<tr><td>${childSnapshot.val().trainName}</td><td>${childSnapshot.val().Destination}</td><td>${childSnapshot.val().FirstTrain}</td><td>${childSnapshot.val().Frequency}</td></tr>`);
-    console.log(childSnapshot.val());
+//calculate minutes away
+
+let newTime = moment(startTime).diff(moment(), "minutes");
+minutesAway = newTime % parseFloat(childSnapshot.val().Frequency) + parseFloat(childSnapshot.val().Frequency)
+
+
+
+
+console.log(minutesAway)
+
+$("#train-table").append(`<tr><td>${childSnapshot.val().trainName}</td><td>${childSnapshot.val().Destination}</td><td>${childSnapshot.val().FirstTrain}</td><td>${childSnapshot.val().Frequency}</td><td>${minutesAway}</td></tr>`);
+    
+
+
+
+
   });
+
+
+
 });
